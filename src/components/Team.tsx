@@ -23,18 +23,11 @@ const teamMembers = [
     description: "Leads strategic initiatives and community outreach programs.",
   },
   {
-    name: "Ritu Gupta",
-    nameHindi: "रितु गुप्ता",
+    name: "Ritu Verma",
+    nameHindi: "रितु वर्मा",
     role: "Secretary",
     roleHindi: "सचिव",
     description: "Manages communications, documentation, and administrative functions.",
-  },
-  {
-    name: "Ramkrishna Gupta",
-    nameHindi: "रामकृष्ण गुप्ता",
-    role: "Treasurer",
-    roleHindi: "कोषाध्यक्ष",
-    description: "Oversees financial management with transparency and accountability.",
   },
 ];
 
