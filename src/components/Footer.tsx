@@ -138,6 +138,9 @@ const Footer = () => {
             <p className="flex items-center gap-1">
               Made with <Heart className="h-4 w-4 text-accent fill-accent" /> for the community
             </p>
+            <p>
+              Website built by Bhawna Rupani
+            </p>
           </div>
         </div>
       </div>
