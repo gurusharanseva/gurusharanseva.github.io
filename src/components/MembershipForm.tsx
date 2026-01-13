@@ -2,8 +2,8 @@ import { Heart, CheckCircle2, FileCheck, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const MembershipForm = () => {
-  const googleFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSdQk_Y7RqRQKQHQoQ4q8FqXVhKQXMpQdQZ_XqQ8FqQdQZ_Xq/viewform?embedded=true";
-  const googleFormDirectUrl = "https://docs.google.com/forms/d/1NOjhKwuieTbHVmn0m9opvFLTMvaGSgJqQMS5AH-C7hM/viewform";
+  const googleFormEmbedUrl = "https://docs.google.com/forms/d/e/1FAIpQLScG4xl2iL71TtCV7V3A8uM_s-GFX60IZuqHJF40QnnscTCRlQ/viewform?embedded=true";
+  const googleFormDirectUrl = "https://docs.google.com/forms/d/e/1FAIpQLScG4xl2iL71TtCV7V3A8uM_s-GFX60IZuqHJF40QnnscTCRlQ/viewform";
 
   return (
     <section id="membership" className="py-20 bg-muted/50">
@@ -96,13 +96,13 @@ const MembershipForm = () => {
             {/* Embedded Google Form */}
             <div className="w-full rounded-lg overflow-hidden bg-background">
               <iframe
-                src="https://docs.google.com/forms/d/e/1FAIpQLSfQoKwuieTbHVmn0m9opvFLTMvaGSgJqQMS5AH-C7hM/viewform?embedded=true"
+                src={googleFormEmbedUrl}
                 width="100%"
-                height="600"
                 frameBorder="0"
                 marginHeight={0}
                 marginWidth={0}
-                className="w-full min-h-[600px]"
+                className="w-full min-h-[500px] sm:min-h-[600px] md:min-h-[800px] lg:min-h-[1000px]"
+                style={{ height: 'auto', minHeight: '500px' }}
                 title="Membership Application Form"
               >
                 Loading…
