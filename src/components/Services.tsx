@@ -16,7 +16,7 @@ const services = [
     icon: Building2,
     title: "Charitable Hospital",
     titleHindi: "धर्मार्थ अस्पताल",
-    description: "Shri Guru Sharan Health Care and Harsh Hospital offer affordable treatment, surgeries, and emergency care for underprivileged families.",
+    description: "Shri Guru Sharan Health Care offers affordable treatment, surgeries, and emergency care for underprivileged families.",
     image: hospitalImage,
     color: "secondary",
   },
