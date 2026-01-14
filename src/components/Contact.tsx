@@ -28,14 +28,14 @@ const Contact = () => {
               Head Office
             </h3>
             <p className="text-muted-foreground leading-relaxed mb-2">
-              B 12/120-A-8-2, Harsh Hospital
+              B 12/120-A-8-2
               <br />
               Bhelupur, Varanasi – 221001
               <br />
               Near Bholagiri Math / Bhelupur Thana
             </p>
             <p className="text-sm text-primary font-medium">
-              कार्यालय: हर्ष हॉस्पिटल, भेलूपुर
+              कार्यालय: भेलूपुर, वाराणसी
             </p>
           </div>
 
