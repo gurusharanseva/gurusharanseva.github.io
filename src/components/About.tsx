@@ -138,14 +138,6 @@ const About = () => {
               </p>
             </div>
 
-            <div className="bg-healing-light p-6 rounded-xl border border-secondary/20">
-              <h4 className="font-semibold text-foreground mb-2">Healthcare Facility</h4>
-              <p className="text-muted-foreground">
-                <strong className="text-foreground">Shri Guru Sharan Health Care</strong> — Our charitable hospital 
-                and <strong className="text-foreground">Harsh Hospital</strong> provide ongoing medical services 
-                to the community at affordable and subsidized rates.
-              </p>
-            </div>
           </div>
         </div>
       </div>
