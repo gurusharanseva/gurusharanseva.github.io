@@ -30,7 +30,7 @@
           var path = '';
           var query = '';
           params.forEach(function(p) {
-            if (p.slice(0,2) === 'p=') path = '/' + p.slice(2).replace(/~and~/g, '&');
+            if (p.slice(0,2) === 'p=') path = p.slice(2).replace(/~and~/g, '&');
             if (p.slice(0,2) === 'q=') query = '?' + p.slice(2).replace(/~and~/g, '&');
           });
           window.history.replaceState(null, null, path + query + l.hash);
