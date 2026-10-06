@@ -1,6 +1,8 @@
 import { Heart, Phone, MapPin, Facebook, Instagram } from "lucide-react";
 import trustLogo from "@/assets/trust-logo.jpg";
 
+const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
@@ -41,36 +43,13 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold text-lg mb-4">Quick Links</h4>
             <ul className="space-y-2">
-              <li>
-                <a href="#about" className="text-primary-foreground/70 hover:text-accent transition-colors">
-                  About Us
-                </a>
-              </li>
-              <li>
-                <a href="#services" className="text-primary-foreground/70 hover:text-accent transition-colors">
-                  Our Services
-                </a>
-              </li>
-              <li>
-                <a href="#impact" className="text-primary-foreground/70 hover:text-accent transition-colors">
-                  Our Impact
-                </a>
-              </li>
-              <li>
-                <a href="#team" className="text-primary-foreground/70 hover:text-accent transition-colors">
-                  Leadership Team
-                </a>
-              </li>
-              <li>
-                <a href="#membership" className="text-primary-foreground/70 hover:text-accent transition-colors">
-                  Become a Member
-                </a>
-              </li>
-              <li>
-                <a href="#contact" className="text-primary-foreground/70 hover:text-accent transition-colors">
-                  Contact Us
-                </a>
-              </li>
+              {[["about","About Us"],["services","Our Services"],["impact","Our Impact"],["team","Leadership Team"],["membership","Become a Member"],["contact","Contact Us"]].map(([id, label]) => (
+                <li key={id}>
+                  <button onClick={() => scrollTo(id)} className="text-primary-foreground/70 hover:text-accent transition-colors text-left">
+                    {label}
+                  </button>
+                </li>
+              ))}
             </ul>
           </div>
 

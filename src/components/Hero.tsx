@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Heart, Users, Shield } from "lucide-react";
 import heroImage from "@/assets/hero-medical-camp.jpg";
 
+const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+
 const Hero = () => {
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden">
@@ -43,17 +45,13 @@ const Hero = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-wrap gap-4 mb-12">
-            <Button variant="hero" size="xl" asChild>
-              <a href="#membership" className="flex items-center gap-2">
-                <Heart className="h-5 w-5" />
-                Become a Member
-              </a>
+            <Button variant="hero" size="xl" onClick={() => scrollTo("membership")} className="flex items-center gap-2">
+              <Heart className="h-5 w-5" />
+              Become a Member
             </Button>
-            <Button variant="outline" size="xl" className="bg-card/10 border-primary-foreground/30 text-primary-foreground hover:bg-card/20 hover:text-primary-foreground" asChild>
-              <a href="#services" className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Our Services
-              </a>
+            <Button variant="outline" size="xl" className="bg-card/10 border-primary-foreground/30 text-primary-foreground hover:bg-card/20 hover:text-primary-foreground flex items-center gap-2" onClick={() => scrollTo("services")}>
+              <Users className="h-5 w-5" />
+              Our Services
             </Button>
           </div>
 

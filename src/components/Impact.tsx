@@ -90,13 +90,13 @@ const Impact = () => {
           <p className="text-primary-foreground/80 mb-4">
             Help us expand our reach and impact more lives
           </p>
-          <a
-            href="#membership"
+          <button
+            onClick={() => document.getElementById("membership")?.scrollIntoView({ behavior: "smooth" })}
             className="inline-flex items-center gap-2 bg-accent text-foreground px-8 py-3 rounded-xl font-semibold hover:shadow-xl hover:-translate-y-1 transition-all"
           >
             <Heart className="h-5 w-5" />
             Join Our Mission
-          </a>
+          </button>
         </div>
       </div>
     </section>

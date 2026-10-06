@@ -3,16 +3,20 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, Phone, Heart } from "lucide-react";
 import trustLogo from "@/assets/trust-logo.jpg";
 
+const scrollTo = (id: string) => {
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+};
+
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navLinks = [
-    { href: "#about", label: "About Us" },
-    { href: "#services", label: "Our Work" },
-    { href: "#impact", label: "Impact" },
-    { href: "#team", label: "Team" },
-    { href: "#membership", label: "Join Us" },
-    { href: "#contact", label: "Contact" },
+    { id: "about", label: "About Us" },
+    { id: "services", label: "Our Work" },
+    { id: "impact", label: "Impact" },
+    { id: "team", label: "Team" },
+    { id: "membership", label: "Join Us" },
+    { id: "contact", label: "Contact" },
   ];
 
   return (
@@ -38,7 +42,7 @@ const Header = () => {
       <nav className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-3 group">
+          <a href="/#/" className="flex items-center gap-3 group">
             <img
               src={trustLogo}
               alt="Shri Guru Sharan Sewa Trust Logo"
@@ -55,20 +59,20 @@ const Header = () => {
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
+              <button
+                key={link.id}
+                onClick={() => scrollTo(link.id)}
                 className="px-4 py-2 text-sm font-medium text-foreground/80 hover:text-primary hover:bg-muted rounded-lg transition-colors"
               >
                 {link.label}
-              </a>
+              </button>
             ))}
           </div>
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="healing" size="sm" asChild>
-              <a href="#donate">Donate Now</a>
+            <Button variant="healing" size="sm" onClick={() => scrollTo("donate")}>
+              Donate Now
             </Button>
           </div>
 
@@ -87,17 +91,16 @@ const Header = () => {
           <div className="lg:hidden mt-4 pb-4 border-t border-border pt-4 animate-fade-in">
             <div className="flex flex-col gap-2">
               {navLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className="px-4 py-3 text-foreground hover:bg-muted rounded-lg transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
+                <button
+                  key={link.id}
+                  onClick={() => { scrollTo(link.id); setIsMenuOpen(false); }}
+                  className="px-4 py-3 text-foreground hover:bg-muted rounded-lg transition-colors text-left"
                 >
                   {link.label}
-                </a>
+                </button>
               ))}
-              <Button variant="healing" className="mt-2" asChild>
-                <a href="#donate">Donate Now</a>
+              <Button variant="healing" className="mt-2" onClick={() => { scrollTo("donate"); setIsMenuOpen(false); }}>
+                Donate Now
               </Button>
             </div>
           </div>
