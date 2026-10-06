@@ -105,7 +105,7 @@ const About = () => {
               <div className="bg-card p-4 rounded-xl shadow-soft border border-border">
                 <MapPin className="h-8 w-8 text-accent mb-2" />
                 <h4 className="font-semibold text-foreground">Location</h4>
-                <p className="text-sm text-muted-foreground">Varanasi, UP</p>
+                <p className="text-sm text-muted-foreground">Manduwadih, Varanasi, UP</p>
               </div>
               <div className="bg-card p-4 rounded-xl shadow-soft border border-border">
                 <Calendar className="h-8 w-8 text-primary mb-2" />

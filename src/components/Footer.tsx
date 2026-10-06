@@ -81,9 +81,11 @@ const Footer = () => {
               <li className="flex items-start gap-2">
                 <MapPin className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
                 <span className="text-primary-foreground/70 text-sm">
-                  B 12/120-A-8-2
+                  Lane No. 5, Ishan Tower 5th Floor,
                   <br />
-                  Bhelupur, Varanasi – 221001
+                  Shri Ram Nagar Colony, Manduwadih,
+                  <br />
+                  Varanasi, Uttar Pradesh, India
                 </span>
               </li>
               <li className="flex items-center gap-2">

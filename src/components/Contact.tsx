@@ -28,11 +28,11 @@ const Contact = () => {
               Head Office
             </h3>
             <p className="text-muted-foreground leading-relaxed mb-2">
-              B 12/120-A-8-2
+              Lane No. 5, Ishan Tower 5th Floor,
               <br />
-              Bhelupur, Varanasi – 221001
+              Shri Ram Nagar Colony, Manduwadih,
               <br />
-              Near Bholagiri Math / Bhelupur Thana
+              Varanasi, Uttar Pradesh, India
             </p>
             <p className="text-sm text-primary font-medium">
               कार्यालय: भेलूपुर, वाराणसी
