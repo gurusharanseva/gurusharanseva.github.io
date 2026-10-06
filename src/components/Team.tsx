@@ -1,33 +1,65 @@
 import { User } from "lucide-react";
+import rajeshPhoto from "@/assets/team-rajesh-bakshi.jpeg";
+import nitaPhoto from "@/assets/team-nita-mishra.jpeg";
+import rituPhoto from "@/assets/team-ritu-verma.jpeg";
+import siddharthaPhoto from "@/assets/team-kumar-siddhartha.jfif";
+import balaramPhoto from "@/assets/team-balaram-pandey.jfif";
+import mritunjayPhoto from "@/assets/team-mritunjay-chakraborty.jfif";
 
-const teamMembers = [
+export const teamMembers = [
   {
+    id: "1",
     name: "Dr. R. K. Bakshi",
     nameHindi: "डॉ. आर. के. बख्शी",
-    role: "Founder",
-    roleHindi: "संस्थापक",
+    role: "Founder & President",
+    roleHindi: "संस्थापक / अध्यक्ष",
     description: "Visionary leader dedicated to bringing quality healthcare to underserved communities.",
+    photoUrl: rajeshPhoto,
   },
   {
-    name: "Balram Pandey",
-    nameHindi: "बलराम पाण्डेय",
-    role: "Manager",
-    roleHindi: "व्यवस्थापक",
-    description: "Ensures smooth operations and coordination of all trust activities.",
-  },
-  {
-    name: "Ranjan Chatterjee",
-    nameHindi: "रंजन चटर्जी",
+    id: "2",
+    name: "Dr. Nita Mishra",
+    nameHindi: "डॉ. नीता मिश्रा",
     role: "Vice President",
     roleHindi: "उपाध्यक्ष",
     description: "Leads strategic initiatives and community outreach programs.",
+    photoUrl: nitaPhoto,
   },
   {
-    name: "Ritu Verma",
-    nameHindi: "रितु वर्मा",
+    id: "3",
+    name: "Smt. Ritu Verma",
+    nameHindi: "श्रीमती रितु वर्मा",
     role: "Secretary",
     roleHindi: "सचिव",
     description: "Manages communications, documentation, and administrative functions.",
+    photoUrl: rituPhoto,
+  },
+  {
+    id: "4",
+    name: "Kumar Siddhartha",
+    nameHindi: "कुमार सिद्धार्थ",
+    role: "Treasurer",
+    roleHindi: "कोषाध्यक्ष",
+    description: "Oversees financial management and ensures transparent use of funds.",
+    photoUrl: siddharthaPhoto,
+  },
+  {
+    id: "5",
+    name: "Sri Balaram Pandey",
+    nameHindi: "श्री बलराम पाण्डेय",
+    role: "Patron / Sanrakshak",
+    roleHindi: "संरक्षक",
+    description: "Ensures smooth operations and coordination of all trust activities.",
+    photoUrl: balaramPhoto,
+  },
+  {
+    id: "6",
+    name: "Mritunjay Chakraborty",
+    nameHindi: "मृत्युंजय चक्रवर्ती",
+    role: "Life Member",
+    roleHindi: "आजीवन सदस्य",
+    description: "Committed lifelong member supporting the trust's mission and vision.",
+    photoUrl: mritunjayPhoto,
   },
 ];
 
@@ -50,16 +82,20 @@ const Team = () => {
         </div>
 
         {/* Team Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {teamMembers.map((member, index) => (
             <div
-              key={member.name}
+              key={member.id}
               className="group bg-card rounded-2xl p-6 text-center shadow-card border border-border hover:shadow-elevated hover:-translate-y-1 transition-all duration-300 animate-fade-up"
               style={{ animationDelay: `${index * 100}ms` }}
             >
               {/* Avatar */}
-              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <User className="h-10 w-10 text-primary" />
+              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center group-hover:scale-110 transition-transform overflow-hidden">
+                {member.photoUrl ? (
+                  <img src={member.photoUrl} alt={member.name} className="w-full h-full object-cover" />
+                ) : (
+                  <User className="h-10 w-10 text-primary" />
+                )}
               </div>
 
               {/* Name */}
