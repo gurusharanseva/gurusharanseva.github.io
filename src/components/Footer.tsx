@@ -119,8 +119,18 @@ const Footer = () => {
             <p className="flex items-center gap-1">
               Made with <Heart className="h-4 w-4 text-accent fill-accent" /> for the community
             </p>
-            <p>
-              Website built by Bhawna Rupani
+            <p className="flex items-center gap-1.5">
+              Made with <Heart className="h-3.5 w-3.5 text-rose-400 fill-rose-400" /> by{" "}
+              <a
+                href="https://www.linkedin.com/in/bhawnarupani/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-accent hover:text-accent/80 font-semibold underline underline-offset-2 transition-colors"
+              >
+                Bhawna Rupani
+              </a>
+              <span className="text-primary-foreground/40">·</span>
+              <span className="text-primary-foreground/50 text-xs">Technical AI Architect</span>
             </p>
           </div>
         </div>
