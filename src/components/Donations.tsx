@@ -12,7 +12,7 @@ const Donations = () => {
     accountHolder: "SHRI GURUSHARAN SEWA TRUST",
     accountNumber: "50200099213758",
     ifsc: "HDFC0009454",
-    branch: "MANDUWADIH, VARANASI",
+    branch: "BHELUPUR, VARANASI",
     accountType: "Current Account",
   };
 
