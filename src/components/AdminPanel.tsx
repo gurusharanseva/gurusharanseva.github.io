@@ -1,13 +1,11 @@
-import { useState, useRef } from "react";
-import { Upload, Trash2, LogOut, Image, Newspaper, Users, HeartHandshake, Eye, EyeOff, Pencil, Check, X, Loader2 } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Upload, Trash2, LogOut, Image, Newspaper, Users, HeartHandshake, Eye, EyeOff, Pencil, Check, X, Loader2, RefreshCw } from "lucide-react";
 import { teamMembers as initialTeam } from "./Team";
-import { uploadToCloudinary } from "@/lib/cloudinary";
+import { uploadToCloudinary, fetchFromCloudinary, CloudinaryResource, CLOUDINARY_CLOUD_NAME } from "@/lib/cloudinary";
 
 const ADMIN_EMAIL = "shreegurusharansevatrust@gmail.com";
 const ADMIN_PASSWORD = "sgst@admin2024";
 
-const mockGalleryItems: { id: string; caption: string; url: string }[] = [];
-const mockNewsItems: { id: string; title: string; date: string; imageUrl: string }[] = [];
 const mockServices = [
   { id: "1", title: "Free Medical Camps", titleHindi: "निशुल्क चिकित्सा शिविर", description: "Regular health camps in rural villages providing free consultations, medicines, and health screenings.", imageUrl: "" },
   { id: "2", title: "Charitable Hospital", titleHindi: "धर्मार्थ अस्पताल", description: "Shri Guru Sharan Health Care offers affordable treatment, surgeries, and emergency care.", imageUrl: "" },
@@ -25,18 +23,6 @@ const TabButton = ({ id, active, icon: Icon, label, onClick }: { id: Tab; active
   </button>
 );
 
-const UploadBox = ({ onUpload, uploading, accept = "image/*,video/*", label = "Upload Photo or Video" }: { onUpload: (file: File) => void; uploading: boolean; accept?: string; label?: string }) => {
-  const ref = useRef<HTMLInputElement>(null);
-  return (
-    <div onClick={() => !uploading && ref.current?.click()} className="bg-card rounded-2xl border-2 border-dashed border-border hover:border-primary transition-colors p-8 text-center cursor-pointer">
-      {uploading ? <Loader2 className="h-10 w-10 text-primary mx-auto mb-3 animate-spin" /> : <Upload className="h-10 w-10 text-muted-foreground mx-auto mb-3" />}
-      <p className="font-medium text-foreground mb-1">{uploading ? "Uploading..." : label}</p>
-      {!uploading && <p className="text-muted-foreground text-xs mt-1">JPG, PNG, JFIF, MP4 supported</p>}
-      <input ref={ref} type="file" accept={accept} className="hidden" onChange={e => { if (e.target.files?.[0]) onUpload(e.target.files[0]); }} />
-    </div>
-  );
-};
-
 const AdminPanel = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [email, setEmail] = useState("");
@@ -45,24 +31,37 @@ const AdminPanel = () => {
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState<Tab>("gallery");
 
-  const [galleryItems, setGalleryItems] = useState(mockGalleryItems);
-  const [newsItems, setNewsItems] = useState(mockNewsItems);
+  // Cloudinary-backed state
+  const [galleryItems, setGalleryItems] = useState<CloudinaryResource[]>([]);
+  const [newsItems, setNewsItems] = useState<CloudinaryResource[]>([]);
+  const [galleryLoading, setGalleryLoading] = useState(false);
+  const [newsLoading, setNewsLoading] = useState(false);
+
   const [teamData, setTeamData] = useState(initialTeam);
   const [services, setServices] = useState(mockServices);
-
   const [uploading, setUploading] = useState<string | null>(null);
+
+  // News form
   const [newTitle, setNewTitle] = useState("");
   const [newDate, setNewDate] = useState("");
   const [newEventFile, setNewEventFile] = useState<File | null>(null);
   const [newEventPreview, setNewEventPreview] = useState("");
 
+  // Team edit
   const [editingTeamId, setEditingTeamId] = useState<string | null>(null);
   const [editTeamName, setEditTeamName] = useState("");
   const [editTeamRole, setEditTeamRole] = useState("");
   const [editTeamRoleHindi, setEditTeamRoleHindi] = useState("");
 
+  // Service edit
   const [editingServiceId, setEditingServiceId] = useState<string | null>(null);
   const [editServiceDesc, setEditServiceDesc] = useState("");
+
+  const loadGallery = () => { setGalleryLoading(true); fetchFromCloudinary("ssgst/gallery").then(setGalleryItems).finally(() => setGalleryLoading(false)); };
+  const loadNews = () => { setNewsLoading(true); fetchFromCloudinary("ssgst/events").then(d => setNewsItems(d.sort((a, b) => new Date(b.context.date || b.createdAt).getTime() - new Date(a.context.date || a.createdAt).getTime()))).finally(() => setNewsLoading(false)); };
+
+  useEffect(() => { if (loggedIn && activeTab === "gallery") loadGallery(); }, [loggedIn, activeTab]);
+  useEffect(() => { if (loggedIn && activeTab === "news") loadNews(); }, [loggedIn, activeTab]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,36 +72,29 @@ const AdminPanel = () => {
   const handleGalleryUpload = async (file: File) => {
     setUploading("gallery");
     try {
-      const url = await uploadToCloudinary(file, "ssgst/gallery");
       const caption = file.name.replace(/\.[^/.]+$/, "");
-      setGalleryItems(prev => [...prev, { id: Date.now().toString(), caption, url }]);
+      await uploadToCloudinary(file, "ssgst/gallery", { caption });
+      setTimeout(loadGallery, 1500);
     } catch { alert("Upload failed. Please try again."); }
     setUploading(null);
   };
 
-  const handleEventFileSelect = (file: File) => {
-    setNewEventFile(file);
-    setNewEventPreview(URL.createObjectURL(file));
-  };
-
   const addNews = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTitle || !newDate) return;
-    let imageUrl = "";
-    if (newEventFile) {
-      setUploading("news");
-      try { imageUrl = await uploadToCloudinary(newEventFile, "ssgst/events"); }
-      catch { alert("Image upload failed."); setUploading(null); return; }
-      setUploading(null);
-    }
-    setNewsItems(prev => [{ id: Date.now().toString(), title: newTitle, date: newDate, imageUrl }, ...prev]);
-    setNewTitle(""); setNewDate(""); setNewEventFile(null); setNewEventPreview("");
+    if (!newTitle || !newDate || !newEventFile) return;
+    setUploading("news");
+    try {
+      await uploadToCloudinary(newEventFile, "ssgst/events", { title: newTitle, date: newDate });
+      setNewTitle(""); setNewDate(""); setNewEventFile(null); setNewEventPreview("");
+      setTimeout(loadNews, 1500);
+    } catch { alert("Upload failed."); }
+    setUploading(null);
   };
 
   const handleTeamPhotoUpload = async (file: File, memberId: string) => {
     setUploading(`team-${memberId}`);
     try {
-      const url = await uploadToCloudinary(file, "ssgst/team");
+      const { url } = await uploadToCloudinary(file, "ssgst/team");
       setTeamData(prev => prev.map(m => m.id === memberId ? { ...m, photoUrl: url } : m));
     } catch { alert("Upload failed."); }
     setUploading(null);
@@ -111,7 +103,7 @@ const AdminPanel = () => {
   const handleServicePhotoUpload = async (file: File, serviceId: string) => {
     setUploading(`service-${serviceId}`);
     try {
-      const url = await uploadToCloudinary(file, "ssgst/services");
+      const { url } = await uploadToCloudinary(file, "ssgst/services");
       setServices(prev => prev.map(s => s.id === serviceId ? { ...s, imageUrl: url } : s));
     } catch { alert("Upload failed."); }
     setUploading(null);
@@ -170,22 +162,27 @@ const AdminPanel = () => {
         {/* ── GALLERY ── */}
         {activeTab === "gallery" && (
           <div className="space-y-6">
-            <UploadBox onUpload={handleGalleryUpload} uploading={uploading === "gallery"} />
-            {galleryItems.length > 0 && (
-              <div>
-                <h3 className="font-semibold text-foreground mb-4">Gallery ({galleryItems.length} items)</h3>
-                <div className="space-y-3">
-                  {galleryItems.map(item => (
-                    <div key={item.id} className="bg-card rounded-xl border border-border p-3 flex items-center gap-4">
-                      <img src={item.url} alt={item.caption} className="w-20 h-14 object-cover rounded-lg flex-shrink-0" />
-                      <span className="text-sm text-foreground flex-1">{item.caption}</span>
-                      <button onClick={() => setGalleryItems(prev => prev.filter(g => g.id !== item.id))} className="text-muted-foreground hover:text-destructive transition-colors p-1"><Trash2 className="h-4 w-4" /></button>
-                    </div>
-                  ))}
-                </div>
+            <div onClick={() => { if (!uploading) document.getElementById("gallery-upload")?.click(); }} className="bg-card rounded-2xl border-2 border-dashed border-border hover:border-primary transition-colors p-8 text-center cursor-pointer">
+              {uploading === "gallery" ? <Loader2 className="h-10 w-10 text-primary mx-auto mb-3 animate-spin" /> : <Upload className="h-10 w-10 text-muted-foreground mx-auto mb-3" />}
+              <p className="font-medium text-foreground mb-1">{uploading === "gallery" ? "Uploading..." : "Upload Photo or Video"}</p>
+              {!uploading && <p className="text-muted-foreground text-xs mt-1">JPG, PNG, JFIF, MP4 supported</p>}
+              <input id="gallery-upload" type="file" accept="image/*,video/*" className="hidden" onChange={e => { if (e.target.files?.[0]) handleGalleryUpload(e.target.files[0]); }} />
+            </div>
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-foreground">Gallery ({galleryItems.length} items)</h3>
+              <button onClick={loadGallery} className="text-muted-foreground hover:text-primary transition-colors"><RefreshCw className={`h-4 w-4 ${galleryLoading ? "animate-spin" : ""}`} /></button>
+            </div>
+            {galleryLoading ? <div className="grid grid-cols-3 gap-3">{[...Array(3)].map((_, i) => <div key={i} className="aspect-video rounded-xl bg-muted animate-pulse" />)}</div> : (
+              <div className="space-y-3">
+                {galleryItems.map(item => (
+                  <div key={item.publicId} className="bg-card rounded-xl border border-border p-3 flex items-center gap-4">
+                    <img src={`https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/w_120,h_80,c_fill/${item.publicId}`} alt="" className="w-20 h-14 object-cover rounded-lg flex-shrink-0" />
+                    <span className="text-sm text-foreground flex-1">{item.context.caption || item.publicId.split("/").pop()}</span>
+                  </div>
+                ))}
+                {galleryItems.length === 0 && <p className="text-center text-muted-foreground text-sm py-4">No photos yet. Upload above.</p>}
               </div>
             )}
-            {galleryItems.length === 0 && <p className="text-center text-muted-foreground text-sm py-4">No photos yet. Upload your first photo above.</p>}
           </div>
         )}
 
@@ -205,32 +202,33 @@ const AdminPanel = () => {
                 </div>
                 {newEventPreview
                   ? <div className="relative rounded-xl overflow-hidden aspect-video"><img src={newEventPreview} className="w-full h-full object-cover" /><button type="button" onClick={() => { setNewEventFile(null); setNewEventPreview(""); }} className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1"><X className="h-4 w-4" /></button></div>
-                  : <div onClick={() => document.getElementById("event-file-input")?.click()} className="bg-muted/50 rounded-xl border-2 border-dashed border-border p-6 text-center cursor-pointer hover:border-primary transition-colors">
+                  : <div onClick={() => document.getElementById("event-file")?.click()} className="bg-muted/50 rounded-xl border-2 border-dashed border-border p-6 text-center cursor-pointer hover:border-primary transition-colors">
                       <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                      <p className="text-sm text-muted-foreground">Upload event photo or video (optional)</p>
-                      <input id="event-file-input" type="file" accept="image/*,video/*" className="hidden" onChange={e => { if (e.target.files?.[0]) handleEventFileSelect(e.target.files[0]); }} />
+                      <p className="text-sm text-muted-foreground">Upload event photo (required)</p>
+                      <input id="event-file" type="file" accept="image/*" className="hidden" onChange={e => { if (e.target.files?.[0]) { setNewEventFile(e.target.files[0]); setNewEventPreview(URL.createObjectURL(e.target.files[0])); }}} />
                     </div>
                 }
-                <button type="submit" disabled={!!uploading} className="w-full bg-secondary text-secondary-foreground py-2.5 rounded-xl font-semibold hover:bg-secondary/90 transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
+                <button type="submit" disabled={!!uploading || !newEventFile} className="w-full bg-secondary text-secondary-foreground py-2.5 rounded-xl font-semibold hover:bg-secondary/90 transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
                   {uploading === "news" ? <><Loader2 className="h-4 w-4 animate-spin" /> Uploading...</> : "Add Event"}
                 </button>
               </form>
             </div>
-            {newsItems.length > 0 && (
-              <div>
-                <h3 className="font-semibold text-foreground mb-4">Events ({newsItems.length})</h3>
-                <div className="space-y-3">
-                  {newsItems.map(item => (
-                    <div key={item.id} className="bg-card rounded-xl border border-border p-4 flex items-center gap-4">
-                      {item.imageUrl && <img src={item.imageUrl} className="w-16 h-12 object-cover rounded-lg flex-shrink-0" />}
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-foreground text-sm truncate">{item.title}</p>
-                        <p className="text-muted-foreground text-xs mt-0.5">{item.date}</p>
-                      </div>
-                      <button onClick={() => setNewsItems(prev => prev.filter(n => n.id !== item.id))} className="text-muted-foreground hover:text-destructive transition-colors p-1"><Trash2 className="h-4 w-4" /></button>
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-foreground">Events ({newsItems.length})</h3>
+              <button onClick={loadNews} className="text-muted-foreground hover:text-primary transition-colors"><RefreshCw className={`h-4 w-4 ${newsLoading ? "animate-spin" : ""}`} /></button>
+            </div>
+            {newsLoading ? <div className="space-y-3">{[...Array(2)].map((_, i) => <div key={i} className="h-16 rounded-xl bg-muted animate-pulse" />)}</div> : (
+              <div className="space-y-3">
+                {newsItems.map(item => (
+                  <div key={item.publicId} className="bg-card rounded-xl border border-border p-4 flex items-center gap-4">
+                    <img src={`https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/w_80,h_60,c_fill/${item.publicId}`} alt="" className="w-16 h-12 object-cover rounded-lg flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-foreground text-sm truncate">{item.context.title}</p>
+                      <p className="text-muted-foreground text-xs mt-0.5">{item.context.date}</p>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
+                {newsItems.length === 0 && <p className="text-center text-muted-foreground text-sm py-4">No events yet. Add one above.</p>}
               </div>
             )}
           </div>
@@ -239,17 +237,16 @@ const AdminPanel = () => {
         {/* ── TEAM ── */}
         {activeTab === "team" && (
           <div className="space-y-4">
-            <p className="text-muted-foreground text-sm">Update team member names, roles, and photos.</p>
+            <p className="text-muted-foreground text-sm">Click on a photo to update it. Click ✏️ to edit name or role.</p>
             {teamData.map(member => (
               <div key={member.id} className="bg-card rounded-2xl border border-border p-5">
                 <div className="flex items-start gap-4">
                   <div className="flex-shrink-0">
-                    <div onClick={() => { const el = document.getElementById(`team-photo-${member.id}`); el?.click(); }} className="w-16 h-16 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2 border-border relative group cursor-pointer">
+                    <div onClick={() => document.getElementById(`team-photo-${member.id}`)?.click()} className="w-16 h-16 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2 border-border relative group cursor-pointer">
                       {uploading === `team-${member.id}` ? <Loader2 className="h-6 w-6 animate-spin text-primary" /> : member.photoUrl ? <img src={member.photoUrl} alt={member.name} className="w-full h-full object-cover" /> : <Users className="h-7 w-7 text-muted-foreground" />}
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-full"><Upload className="h-5 w-5 text-white" /></div>
                     </div>
                     <input id={`team-photo-${member.id}`} type="file" accept="image/*,.jfif" className="hidden" onChange={e => { if (e.target.files?.[0]) handleTeamPhotoUpload(e.target.files[0], member.id); }} />
-                    <p className="text-xs text-muted-foreground text-center mt-1">Photo</p>
                   </div>
                   <div className="flex-1 min-w-0">
                     {editingTeamId === member.id ? (
@@ -257,7 +254,7 @@ const AdminPanel = () => {
                         <input value={editTeamName} onChange={e => setEditTeamName(e.target.value)} className="w-full px-3 py-1.5 rounded-lg border border-input bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Full name" />
                         <input value={editTeamRole} onChange={e => setEditTeamRole(e.target.value)} className="w-full px-3 py-1.5 rounded-lg border border-input bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Role in English" />
                         <input value={editTeamRoleHindi} onChange={e => setEditTeamRoleHindi(e.target.value)} className="w-full px-3 py-1.5 rounded-lg border border-input bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="भूमिका हिंदी में" />
-                        <div className="flex gap-2 mt-1">
+                        <div className="flex gap-2">
                           <button onClick={() => saveTeamEdit(member.id)} className="flex items-center gap-1 px-3 py-1 bg-secondary text-secondary-foreground rounded-lg text-xs font-medium"><Check className="h-3 w-3" /> Save</button>
                           <button onClick={() => setEditingTeamId(null)} className="flex items-center gap-1 px-3 py-1 bg-muted text-muted-foreground rounded-lg text-xs font-medium"><X className="h-3 w-3" /> Cancel</button>
                         </div>
@@ -280,7 +277,7 @@ const AdminPanel = () => {
         {/* ── SERVICES ── */}
         {activeTab === "services" && (
           <div className="space-y-4">
-            <p className="text-muted-foreground text-sm">Update service photos and descriptions for the "How We Serve" section.</p>
+            <p className="text-muted-foreground text-sm">Click on a photo to update it. Click ✏️ to edit description.</p>
             {services.map(service => (
               <div key={service.id} className="bg-card rounded-2xl border border-border p-5">
                 <div className="flex items-start gap-4">
@@ -290,7 +287,6 @@ const AdminPanel = () => {
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl"><Upload className="h-5 w-5 text-white" /></div>
                     </div>
                     <input id={`service-photo-${service.id}`} type="file" accept="image/*" className="hidden" onChange={e => { if (e.target.files?.[0]) handleServicePhotoUpload(e.target.files[0], service.id); }} />
-                    <p className="text-xs text-muted-foreground text-center mt-1">Photo</p>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-foreground text-sm">{service.title}</p>
@@ -303,9 +299,7 @@ const AdminPanel = () => {
                           <button onClick={() => setEditingServiceId(null)} className="flex items-center gap-1 px-3 py-1 bg-muted text-muted-foreground rounded-lg text-xs font-medium"><X className="h-3 w-3" /> Cancel</button>
                         </div>
                       </div>
-                    ) : (
-                      <p className="text-xs text-muted-foreground leading-relaxed">{service.description}</p>
-                    )}
+                    ) : <p className="text-xs text-muted-foreground leading-relaxed">{service.description}</p>}
                   </div>
                   {editingServiceId !== service.id && <button onClick={() => startEditService(service)} className="text-muted-foreground hover:text-primary transition-colors p-1 flex-shrink-0"><Pencil className="h-4 w-4" /></button>}
                 </div>
