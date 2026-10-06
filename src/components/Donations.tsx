@@ -2,6 +2,7 @@ import { CreditCard, Building2, Copy, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import donationQR from "@/assets/donation-qr.png";
 
 const Donations = () => {
   const { toast } = useToast();
@@ -11,7 +12,7 @@ const Donations = () => {
     accountHolder: "SHRI GURUSHARAN SEWA TRUST",
     accountNumber: "50200099213758",
     ifsc: "HDFC0009454",
-    branch: "BHELUPUR, VARANASI",
+    branch: "MANDUWADIH, VARANASI",
     accountType: "Current Account",
   };
 
@@ -90,6 +91,16 @@ const Donations = () => {
                   </Button>
                 </div>
               ))}
+            </div>
+
+            {/* QR Code */}
+            <div className="px-6 pb-4 text-center">
+              <p className="text-sm text-muted-foreground mb-3 font-medium">Scan to Pay / स्कैन करें</p>
+              <img
+                src={donationQR}
+                alt="Donation QR Code"
+                className="w-48 h-48 mx-auto rounded-xl border border-border shadow-soft"
+              />
             </div>
 
             {/* Footer Note */}
