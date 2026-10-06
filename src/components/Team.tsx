@@ -45,8 +45,8 @@ export const teamMembers = [
   },
   {
     id: "5",
-    name: "Sri Balaram Pandey",
-    nameHindi: "श्री बलराम पाण्डेय",
+    name: "Sri Baloram Pandey",
+    nameHindi: "श्री बलोराम पाण्डेय",
     role: "Patron / Sanrakshak",
     roleHindi: "संरक्षक",
     description: "Ensures smooth operations and coordination of all trust activities.",
