@@ -35,7 +35,7 @@ const Contact = () => {
               Varanasi, Uttar Pradesh, India
             </p>
             <p className="text-sm text-primary font-medium">
-              कार्यालय: भेलूपुर, वाराणसी
+              कार्यालय: मंडुवाडीह, वाराणसी
             </p>
           </div>
 
@@ -124,7 +124,7 @@ const Contact = () => {
           <div className="bg-card rounded-2xl overflow-hidden shadow-card border border-border animate-fade-up animation-delay-400">
             <iframe
               title="Trust Location"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3606.9476987366714!2d82.99076831501578!3d25.30285983536883!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x398e31e8b3c4c00d%3A0x7a5f9e8f4f9f1f1f!2sBhelupur%2C%20Varanasi%2C%20Uttar%20Pradesh%20221001!5e0!3m2!1sen!2sin!4v1620000000000!5m2!1sen!2sin"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3606.9!2d83.0050!3d25.3350!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x398e2e1234567890%3A0xabcdef1234567890!2sManduwadih%2C%20Varanasi%2C%20Uttar%20Pradesh!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
               width="100%"
               height="280"
               style={{ border: 0 }}
