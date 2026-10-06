@@ -62,6 +62,29 @@ const Contact = () => {
             </div>
           </div>
 
+          <div className="bg-card rounded-2xl p-8 shadow-card border border-border hover:shadow-elevated transition-shadow animate-fade-up animation-delay-300">
+            <div className="p-3 bg-primary/10 rounded-xl w-fit mb-4">
+              <Mail className="h-6 w-6 text-primary" />
+            </div>
+            <h3 className="font-playfair text-xl font-bold text-foreground mb-3">
+              Email
+            </h3>
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm text-muted-foreground">Trust Email</p>
+                <a href="mailto:shreegurusharansevatrust@gmail.com" className="text-sm font-semibold text-foreground hover:text-primary transition-colors break-all">
+                  shreegurusharansevatrust@gmail.com
+                </a>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Tech & Web Services</p>
+                <a href="mailto:bhawna.rupani.ai@gmail.com" className="text-sm font-semibold text-foreground hover:text-primary transition-colors break-all">
+                  bhawna.rupani.ai@gmail.com
+                </a>
+              </div>
+            </div>
+          </div>
+
           <div className="bg-card rounded-2xl p-8 shadow-card border border-border hover:shadow-elevated transition-shadow animate-fade-up animation-delay-400">
             <div className="p-3 bg-accent/20 rounded-xl w-fit mb-4">
               <Clock className="h-6 w-6 text-accent" />

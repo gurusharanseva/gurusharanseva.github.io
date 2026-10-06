@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Phone, Heart } from "lucide-react";
+import { Menu, X, Phone, Heart, Mail, Linkedin } from "lucide-react";
 import trustLogo from "@/assets/trust-logo.jpg";
 
 const scrollTo = (id: string) => {
@@ -21,6 +21,49 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border shadow-soft">
+      {/* AI Services Banner */}
+      <div className="bg-black/70 backdrop-blur-sm text-white/90 py-1.5 px-4 text-center text-xs">
+        <span className="inline-flex items-center gap-2 flex-wrap justify-center">
+          <span>Need AI, Tech or Website services?</span>
+          <a
+            href="https://www.linkedin.com/in/bhawnarupani/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-yellow-300 hover:text-yellow-200 underline underline-offset-2 transition-colors"
+          >
+            Contact Bhawna Rupani
+          </a>
+          <span className="text-white/30">·</span>
+          <span className="hidden sm:inline-flex items-center gap-1 text-white/50">
+            Made with <Heart className="h-3 w-3 text-rose-400 fill-rose-400" /> by Bhawna Rupani · Technical AI Architect
+          </span>
+          <span className="hidden sm:inline text-white/30">·</span>
+          <a
+            href="mailto:bhawna.rupani.ai@gmail.com"
+            className="inline-flex items-center gap-1 text-white/80 hover:text-white transition-colors"
+          >
+            <Mail className="h-3 w-3" />
+            <span>Email</span>
+          </a>
+          <a
+            href="mailto:bhawna.rupani.ai@gmail.com"
+            className="hidden md:inline text-white/60 hover:text-white transition-colors"
+          >
+            bhawna.rupani.ai@gmail.com
+          </a>
+          <span className="text-white/30">·</span>
+          <a
+            href="https://www.linkedin.com/in/bhawnarupani/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-blue-300 hover:text-blue-200 transition-colors"
+          >
+            <Linkedin className="h-3 w-3" />
+            <span>LinkedIn</span>
+          </a>
+        </span>
+      </div>
+
       {/* Top bar with contact */}
       <div className="bg-primary text-primary-foreground py-2 px-4">
         <div className="container mx-auto flex justify-between items-center text-sm">
