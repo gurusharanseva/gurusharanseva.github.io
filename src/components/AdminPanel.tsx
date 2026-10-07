@@ -37,8 +37,18 @@ const AdminPanel = () => {
   const [galleryLoading, setGalleryLoading] = useState(false);
   const [newsLoading, setNewsLoading] = useState(false);
 
-  const [teamData, setTeamData] = useState(initialTeam);
-  const [services, setServices] = useState(mockServices);
+  const [teamData, setTeamData] = useState(() => {
+    try {
+      const saved = localStorage.getItem("ssgst_team");
+      return saved ? JSON.parse(saved) : initialTeam;
+    } catch { return initialTeam; }
+  });
+  const [services, setServices] = useState(() => {
+    try {
+      const saved = localStorage.getItem("ssgst_services");
+      return saved ? JSON.parse(saved) : mockServices;
+    } catch { return mockServices; }
+  });
   const [uploading, setUploading] = useState<string | null>(null);
 
   // News form
@@ -95,7 +105,11 @@ const AdminPanel = () => {
     setUploading(`team-${memberId}`);
     try {
       const { url } = await uploadToCloudinary(file, "ssgst/team");
-      setTeamData(prev => prev.map(m => m.id === memberId ? { ...m, photoUrl: url } : m));
+      setTeamData(prev => {
+        const updated = prev.map(m => m.id === memberId ? { ...m, photoUrl: url } : m);
+        try { localStorage.setItem("ssgst_team", JSON.stringify(updated)); } catch {}
+        return updated;
+      });
     } catch { alert("Upload failed."); }
     setUploading(null);
   };
@@ -110,9 +124,23 @@ const AdminPanel = () => {
   };
 
   const startEditTeam = (m: typeof teamData[0]) => { setEditingTeamId(m.id); setEditTeamName(m.name); setEditTeamRole(m.role); setEditTeamRoleHindi(m.roleHindi); };
-  const saveTeamEdit = (id: string) => { setTeamData(prev => prev.map(m => m.id === id ? { ...m, name: editTeamName, role: editTeamRole, roleHindi: editTeamRoleHindi } : m)); setEditingTeamId(null); };
+  const saveTeamEdit = (id: string) => {
+    setTeamData(prev => {
+      const updated = prev.map(m => m.id === id ? { ...m, name: editTeamName, role: editTeamRole, roleHindi: editTeamRoleHindi } : m);
+      try { localStorage.setItem("ssgst_team", JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+    setEditingTeamId(null);
+  };
   const startEditService = (s: typeof services[0]) => { setEditingServiceId(s.id); setEditServiceDesc(s.description); };
-  const saveServiceEdit = (id: string) => { setServices(prev => prev.map(s => s.id === id ? { ...s, description: editServiceDesc } : s)); setEditingServiceId(null); };
+  const saveServiceEdit = (id: string) => {
+    setServices(prev => {
+      const updated = prev.map(s => s.id === id ? { ...s, description: editServiceDesc } : s);
+      try { localStorage.setItem("ssgst_services", JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+    setEditingServiceId(null);
+  };
 
   if (!loggedIn) return (
     <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4">

@@ -18,8 +18,8 @@ export const teamMembers = [
   },
   {
     id: "2",
-    name: "Dr. Nita Mishra",
-    nameHindi: "डॉ. नीता मिश्रा",
+    name: "Dr. Nita Mitra",
+    nameHindi: "डॉ. नीता मित्रा",
     role: "Vice President",
     roleHindi: "उपाध्यक्ष",
     description: "Leads strategic initiatives and community outreach programs.",
