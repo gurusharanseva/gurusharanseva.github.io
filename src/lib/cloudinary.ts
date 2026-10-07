@@ -59,7 +59,7 @@ export const deleteFromCloudinary = async (publicId: string): Promise<void> => {
   );
 };
 
-// Upload a JSON config object (team data, service data etc.)
+// Upload a JSON config object. Returns the versioned URL which bypasses CDN cache.
 export const uploadConfig = async (key: string, data: unknown): Promise<void> => {
   const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
   const file = new File([blob], `${key}.json`);
@@ -67,21 +67,28 @@ export const uploadConfig = async (key: string, data: unknown): Promise<void> =>
   formData.append("file", file);
   formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
   formData.append("public_id", `ssgst/config/${key}`);
-  formData.append("overwrite", "true");
-  formData.append("invalidate", "true");
-  await fetch(
+  const res = await fetch(
     `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/raw/upload`,
     { method: "POST", body: formData }
   );
+  if (res.ok) {
+    const result = await res.json();
+    // Store the versioned URL so fetchConfig can bypass CDN cache
+    try { localStorage.setItem(`cfg_url_${key}`, result.secure_url); } catch {}
+  }
 };
 
-// Fetch a JSON config object
+// Fetch a JSON config object. Uses versioned URL from localStorage when available to bypass CDN cache.
 export const fetchConfig = async <T>(key: string): Promise<T | null> => {
   try {
-    const res = await fetch(
-      `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/raw/upload/ssgst/config/${key}.json?t=${Date.now()}`,
-      { cache: "no-store" }
-    );
+    let url: string;
+    try {
+      const versionedUrl = localStorage.getItem(`cfg_url_${key}`);
+      url = versionedUrl ?? `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/raw/upload/ssgst/config/${key}.json`;
+    } catch {
+      url = `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/raw/upload/ssgst/config/${key}.json`;
+    }
+    const res = await fetch(`${url}?t=${Date.now()}`, { cache: "no-store" });
     if (!res.ok) return null;
     return await res.json() as T;
   } catch {
