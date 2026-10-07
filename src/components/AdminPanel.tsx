@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Upload, Trash2, LogOut, Image, Newspaper, Users, HeartHandshake, Eye, EyeOff, Pencil, Check, X, Loader2, RefreshCw } from "lucide-react";
 import { teamMembers as initialTeam } from "./Team";
-import { uploadToCloudinary, fetchFromCloudinary, CloudinaryResource, CLOUDINARY_CLOUD_NAME } from "@/lib/cloudinary";
+import { uploadToCloudinary, fetchFromCloudinary, uploadConfig, fetchConfig, CloudinaryResource, CLOUDINARY_CLOUD_NAME } from "@/lib/cloudinary";
 
 const ADMIN_EMAIL = "shreegurusharansevatrust@gmail.com";
 const ADMIN_PASSWORD = "sgst@admin2024";
@@ -37,18 +37,8 @@ const AdminPanel = () => {
   const [galleryLoading, setGalleryLoading] = useState(false);
   const [newsLoading, setNewsLoading] = useState(false);
 
-  const [teamData, setTeamData] = useState(() => {
-    try {
-      const saved = localStorage.getItem("ssgst_team");
-      return saved ? JSON.parse(saved) : initialTeam;
-    } catch { return initialTeam; }
-  });
-  const [services, setServices] = useState(() => {
-    try {
-      const saved = localStorage.getItem("ssgst_services");
-      return saved ? JSON.parse(saved) : mockServices;
-    } catch { return mockServices; }
-  });
+  const [teamData, setTeamData] = useState(initialTeam);
+  const [services, setServices] = useState(mockServices);
   const [uploading, setUploading] = useState<string | null>(null);
 
   // News form
@@ -72,6 +62,17 @@ const AdminPanel = () => {
 
   useEffect(() => { if (loggedIn && activeTab === "gallery") loadGallery(); }, [loggedIn, activeTab]);
   useEffect(() => { if (loggedIn && activeTab === "news") loadNews(); }, [loggedIn, activeTab]);
+
+  // Load saved team/service config from Cloudinary on login
+  useEffect(() => {
+    if (!loggedIn) return;
+    fetchConfig<Record<string, any>>("team").then(overrides => {
+      if (overrides) setTeamData(initialTeam.map(m => ({ ...m, ...overrides[m.id] })));
+    });
+    fetchConfig<Record<string, any>>("services").then(overrides => {
+      if (overrides) setServices(mockServices.map(s => ({ ...s, ...overrides[s.id] })));
+    });
+  }, [loggedIn]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,7 +108,8 @@ const AdminPanel = () => {
       const { url } = await uploadToCloudinary(file, "ssgst/team");
       setTeamData(prev => {
         const updated = prev.map(m => m.id === memberId ? { ...m, photoUrl: url } : m);
-        try { localStorage.setItem("ssgst_team", JSON.stringify(updated)); } catch {}
+        const overrides = Object.fromEntries(updated.map(m => [m.id, { name: m.name, role: m.role, roleHindi: m.roleHindi, photoUrl: m.photoUrl }]));
+        uploadConfig("team", overrides);
         return updated;
       });
     } catch { alert("Upload failed."); }
@@ -118,7 +120,12 @@ const AdminPanel = () => {
     setUploading(`service-${serviceId}`);
     try {
       const { url } = await uploadToCloudinary(file, "ssgst/services");
-      setServices(prev => prev.map(s => s.id === serviceId ? { ...s, imageUrl: url } : s));
+      setServices(prev => {
+        const updated = prev.map(s => s.id === serviceId ? { ...s, imageUrl: url } : s);
+        const overrides = Object.fromEntries(updated.map(s => [s.id, { description: s.description, imageUrl: s.imageUrl }]));
+        uploadConfig("services", overrides);
+        return updated;
+      });
     } catch { alert("Upload failed."); }
     setUploading(null);
   };
@@ -127,7 +134,8 @@ const AdminPanel = () => {
   const saveTeamEdit = (id: string) => {
     setTeamData(prev => {
       const updated = prev.map(m => m.id === id ? { ...m, name: editTeamName, role: editTeamRole, roleHindi: editTeamRoleHindi } : m);
-      try { localStorage.setItem("ssgst_team", JSON.stringify(updated)); } catch {}
+      const overrides = Object.fromEntries(updated.map(m => [m.id, { name: m.name, role: m.role, roleHindi: m.roleHindi, photoUrl: m.photoUrl }]));
+      uploadConfig("team", overrides);
       return updated;
     });
     setEditingTeamId(null);
@@ -136,7 +144,8 @@ const AdminPanel = () => {
   const saveServiceEdit = (id: string) => {
     setServices(prev => {
       const updated = prev.map(s => s.id === id ? { ...s, description: editServiceDesc } : s);
-      try { localStorage.setItem("ssgst_services", JSON.stringify(updated)); } catch {}
+      const overrides = Object.fromEntries(updated.map(s => [s.id, { description: s.description, imageUrl: s.imageUrl }]));
+      uploadConfig("services", overrides);
       return updated;
     });
     setEditingServiceId(null);

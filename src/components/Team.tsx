@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { User } from "lucide-react";
 import rajeshPhoto from "@/assets/team-rajesh-bakshi.jpeg";
 import nitaPhoto from "@/assets/team-nita-mishra.jpeg";
@@ -5,6 +6,7 @@ import rituPhoto from "@/assets/team-ritu-verma.jpeg";
 import siddharthaPhoto from "@/assets/team-kumar-siddhartha.jfif";
 import balaramPhoto from "@/assets/team-balaram-pandey.jfif";
 import mritunjayPhoto from "@/assets/team-mritunjay-chakraborty.jfif";
+import { fetchConfig } from "@/lib/cloudinary";
 
 export const teamMembers = [
   {
@@ -63,7 +65,18 @@ export const teamMembers = [
   },
 ];
 
+type TeamOverrides = Record<string, { name?: string; role?: string; roleHindi?: string; photoUrl?: string }>;
+
 const Team = () => {
+  const [members, setMembers] = useState(teamMembers);
+
+  useEffect(() => {
+    fetchConfig<TeamOverrides>("team").then(overrides => {
+      if (!overrides) return;
+      setMembers(teamMembers.map(m => ({ ...m, ...overrides[m.id] })));
+    });
+  }, []);
+
   return (
     <section id="team" className="py-20 bg-background">
       <div className="container mx-auto px-4">
@@ -83,7 +96,7 @@ const Team = () => {
 
         {/* Team Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {teamMembers.map((member, index) => (
+          {members.map((member, index) => (
             <div
               key={member.id}
               className="group bg-card rounded-2xl p-6 text-center shadow-card border border-border hover:shadow-elevated hover:-translate-y-1 transition-all duration-300 animate-fade-up"

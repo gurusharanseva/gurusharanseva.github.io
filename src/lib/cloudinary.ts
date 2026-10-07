@@ -58,3 +58,33 @@ export const deleteFromCloudinary = async (publicId: string): Promise<void> => {
     { method: "POST", body: formData }
   );
 };
+
+// Upload a JSON config object (team data, service data etc.)
+export const uploadConfig = async (key: string, data: unknown): Promise<void> => {
+  const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+  const file = new File([blob], `${key}.json`);
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+  formData.append("public_id", `ssgst/config/${key}`);
+  formData.append("overwrite", "true");
+  formData.append("invalidate", "true");
+  await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/raw/upload`,
+    { method: "POST", body: formData }
+  );
+};
+
+// Fetch a JSON config object
+export const fetchConfig = async <T>(key: string): Promise<T | null> => {
+  try {
+    const res = await fetch(
+      `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/raw/upload/ssgst/config/${key}.json?t=${Date.now()}`,
+      { cache: "no-store" }
+    );
+    if (!res.ok) return null;
+    return await res.json() as T;
+  } catch {
+    return null;
+  }
+};
